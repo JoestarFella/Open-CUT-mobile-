@@ -1,51 +1,13 @@
-name: Build Android APK
-
-on:
-  workflow_dispatch:
-
-jobs:
-  apk:
-    runs-on: ubuntu-latest
-    timeout-minutes: 40
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Extrair o projeto do zip
-        run: unzip -q OpenCut-mobile.zip
-
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: 1.3.11
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
-      - uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 21
-
-      - name: Build web (SPA estático)
-        working-directory: OpenCut-main/apps/web
-        run: |
-          bun install
-          bunx vite build --config vite.config.mobile.ts
-
-      - name: Sincronizar com Android
-        working-directory: OpenCut-main/apps/mobile
-        run: |
-          bun install
-          bunx cap sync android
-
-      - name: Build APK (debug, instalável)
-        working-directory: OpenCut-main/apps/mobile/android
-        run: |
-          chmod +x ./gradlew
-          ./gradlew assembleDebug --no-daemon
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: OpenCut-apk
-          path: OpenCut-main/apps/mobile/android/app/build/outputs/apk/debug/app-debug.apk
-          if-no-files-found: error
+{"name":"Build Android APK",
+"on":{"workflow_dispatch":{}},
+"jobs":{"apk":{"runs-on":"ubuntu-latest","timeout-minutes":40,"steps":[
+{"uses":"actions/checkout@v4"},
+{"name":"Extrair o projeto do zip","run":"unzip -q OpenCut-mobile.zip"},
+{"uses":"oven-sh/setup-bun@v2","with":{"bun-version":"1.3.11"}},
+{"uses":"actions/setup-node@v4","with":{"node-version":22}},
+{"uses":"actions/setup-java@v4","with":{"distribution":"temurin","java-version":21}},
+{"name":"Build web","working-directory":"OpenCut-main/apps/web","run":"bun install && bunx vite build --config vite.config.mobile.ts"},
+{"name":"Sincronizar com Android","working-directory":"OpenCut-main/apps/mobile","run":"bun install && bunx cap sync android"},
+{"name":"Build APK","working-directory":"OpenCut-main/apps/mobile/android","run":"chmod +x ./gradlew && ./gradlew assembleDebug --no-daemon"},
+{"uses":"actions/upload-artifact@v4","with":{"name":"OpenCut-apk","path":"OpenCut-main/apps/mobile/android/app/build/outputs/apk/debug/app-debug.apk","if-no-files-found":"error"}}
+]}}}
